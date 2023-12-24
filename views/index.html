@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VietPhrase App</title>
+</head>
+<body>
+    <h1>VietPhrase App</h1>
+    <form id="translationForm">
+        <label for="textInput">Nhập văn bản tiếng Trung:</label>
+        <textarea id="textInput" name="text" rows="20" style="width: 100%;" required></textarea>
+        <button type="button" onclick="translateText()">Dịch</button>
+    </form>
+
+    <p id="translationResult"></p>
+
+    <script>
+        async function translateText() {
+            const inputText = document.getElementById('textInput').value;
+            const response = await fetch('/translate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text: inputText }),
+            });
+            const data = await response.json();
+            document.getElementById('translationResult').innerText = data.translatedText;
+        }
+    </script>
+</body>
+</html>
