@@ -35,6 +35,7 @@ app.post('/translate/edit', async (req, res) => {
 
         const translatedText = splitText.map(word => {
             let translation = '';
+            let phienAm = [];
 
             // Tìm kiếm từ trong từ điển
             const searchResult = dictionary.search(word);
@@ -42,6 +43,7 @@ app.post('/translate/edit', async (req, res) => {
             // Nếu tìm thấy, sử dụng nghĩa đầu tiên (nếu có)
             if (searchResult) {
                 translation = searchResult;
+                phienAm = word.split('').map(char => dictionary.phienAmDictionary.get(char));
             } else {
                 // Nếu không tìm thấy, thử tìm trong từ điển phát âm
                 const phienAmResult = dictionary.phienAmDictionary.get(word);
@@ -49,16 +51,19 @@ app.post('/translate/edit', async (req, res) => {
                 // Nếu tìm thấy trong từ điển phát âm, sử dụng kết quả đó
                 if (phienAmResult) {
                     translation = phienAmResult;
+                    phienAm = [phienAmResult];
                 } else {
                     // Nếu không tìm thấy ở cả hai nơi, sử dụng từ gốc
                     translation = word;
+                    phienAm = [];
                 }
             }
 
             // Trả về chuỗi "{translation} {word} {phienAm.join(' ')}"
             return {
                 h: word,
-                v: translation
+                v: translation,
+                hv: phienAm.join(' ')
             };
         });
 
