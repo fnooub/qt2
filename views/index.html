@@ -16,17 +16,23 @@
     <p id="translationResult"></p>
 
     <script>
-        async function translateText() {
+        function translateText() {
             const inputText = document.getElementById('textInput').value;
-            const response = await fetch('/translate', {
+
+            fetch('/translate', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({ text: inputText }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('translationResult').innerText = data;
+            })
+            .catch(error => {
+                console.error('Lỗi trong quá trình dịch:', error);
             });
-            const data = await response.json();
-            document.getElementById('translationResult').innerText = data.translatedText;
         }
     </script>
 </body>
