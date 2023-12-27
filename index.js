@@ -17,7 +17,7 @@ dictionary.init().then(() => {
 app.use(cors()); // Kích hoạt middleware CORS
 app.use(bodyParser.json());
 
-app.post('/translate', async (req, res) => {
+app.post('/translate', (req, res) => {
     try {
         const text = req.body.text || '';
         let isEditMode = false;
@@ -62,7 +62,7 @@ app.post('/translate', async (req, res) => {
                 return [word, translation, phienAm.join(' ')];
             });
         } else {
-            translatedText = await dictionary.translate(text);
+            translatedText = dictionary.translate(text);
         }
 
         res.json(translatedText);
@@ -72,6 +72,7 @@ app.post('/translate', async (req, res) => {
         res.status(500).json({ error: 'Lỗi dịch' });
     }
 });
+
 
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'views', 'index.html'));
