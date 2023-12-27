@@ -19,55 +19,54 @@ app.use(bodyParser.json());
 
 app.post('/translate', async (req, res) => {
     try {
-        const inputText = req.body.text || '';
-        const translatedText = await dictionary.translate(inputText);
-        res.json({ translatedText });
-    } catch (error) {
-        console.error('Lỗi dịch:', error);
-        res.status(500).json({ error: 'Lỗi dịch' });
-    }
-});
+        const text = req.body.text || '';
+        let isEditMode = false;
 
-app.post('/translate/edit', async (req, res) => {
-    try {
-        const inputText = req.body.text || '';
-        const splitText = dictionary.tokenize(inputText);
+        // Kiểm tra xem có thuộc tính 'type' trong yêu cầu không
+        if (req.body.type === 'edit') {
+            isEditMode = true;
+        }
 
-        const translatedText = splitText.map(word => {
-            let translation = '';
-            let phienAm = [];
+        let translatedText;
 
-            // Tìm kiếm từ trong từ điển
-            const searchResult = dictionary.search(word);
+        if (isEditMode) {
+            const splitText = dictionary.tokenize(text);
 
-            // Nếu tìm thấy, sử dụng nghĩa đầu tiên (nếu có)
-            if (searchResult) {
-                translation = searchResult;
-                phienAm = word.split('').map(char => dictionary.phienAmDictionary.get(char));
-            } else {
-                // Nếu không tìm thấy, thử tìm trong từ điển phát âm
-                const phienAmResult = dictionary.phienAmDictionary.get(word);
+            translatedText = splitText.map(word => {
+                let translation = '';
+                let phienAm = [];
 
-                // Nếu tìm thấy trong từ điển phát âm, sử dụng kết quả đó
-                if (phienAmResult) {
-                    translation = phienAmResult;
-                    phienAm = [phienAmResult];
+                // Tìm kiếm từ trong từ điển
+                const searchResult = dictionary.search(word);
+
+                // Nếu tìm thấy, sử dụng nghĩa đầu tiên (nếu có)
+                if (searchResult) {
+                    translation = searchResult;
+                    phienAm = word.split('').map(char => dictionary.phienAmDictionary.get(char));
                 } else {
-                    // Nếu không tìm thấy ở cả hai nơi, sử dụng từ gốc
-                    translation = word;
-                    phienAm = [];
+                    // Nếu không tìm thấy, thử tìm trong từ điển phát âm
+                    const phienAmResult = dictionary.phienAmDictionary.get(word);
+
+                    // Nếu tìm thấy trong từ điển phát âm, sử dụng kết quả đó
+                    if (phienAmResult) {
+                        translation = phienAmResult;
+                        phienAm = [phienAmResult];
+                    } else {
+                        // Nếu không tìm thấy ở cả hai nơi, sử dụng từ gốc
+                        translation = word;
+                        phienAm = [];
+                    }
                 }
-            }
 
-            // Trả về chuỗi "{translation} {word} {phienAm.join(' ')}"
-            return {
-                h: word,
-                v: translation,
-                hv: phienAm.join(' ')
-            };
-        });
+                // Trả về chuỗi "{translation} {word} {phienAm.join(' ')}"
+                return [word, translation, phienAm.join(' ')];
+            });
+        } else {
+            translatedText = await dictionary.translate(text);
+        }
 
-        res.json({ translatedText });
+        res.json(translatedText);
+
     } catch (error) {
         console.error('Lỗi dịch:', error);
         res.status(500).json({ error: 'Lỗi dịch' });
