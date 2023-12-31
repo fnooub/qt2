@@ -31,25 +31,29 @@ app.post('/translate', async (req, res) => {
         const translateText = async (inputText) => {
             let translation;
             let phienAm = [];
+            let weights = 0;
 
             const searchResult = dictionary.search(inputText);
 
             if (searchResult) {
                 translation = searchResult;
                 phienAm = inputText.split('').map(char => dictionary.phienAmDictionary.get(char));
+                weights = 1;
             } else {
                 const phienAmResult = dictionary.phienAmDictionary.get(inputText);
 
                 if (phienAmResult) {
                     translation = phienAmResult;
                     phienAm = [phienAmResult];
+                    weights = 2;
                 } else {
                     translation = inputText;
                     phienAm = inputText.split('').map(char => dictionary.phienAmDictionary.get(char));
+                    weights = 0;
                 }
             }
 
-            return [inputText, translation, phienAm.join(' ')];
+            return [inputText, translation, phienAm.join(' '), weights];
         };
 
         let translatedText;
