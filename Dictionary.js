@@ -199,11 +199,11 @@ class Dictionary {
     // Phương thức chuyển đổi dấu câu Trung Quốc sang chữ La-tinh
     convertPunctuation(text) {
         const mapping = {
-            '。': '. ', '，': ', ', '、': ', ', '；': ';', '！': '!', '？': '?',
-            '：': ': ', '（': '(', '）': ')', '〔': '[', '〕': ']', '【': '[',
-            '】': ']', '《': '«', '》': '»', '｛': '{', '｝': '}', '『': '[',
-            '』': ']', '〈': '«', '〉': '»', '～': '~', '…': '...',
-            '〖': '[', '〗': ']', '〘': '[', '〙': ']', '〚': '[', '〛': ']', '　': ' '
+            "。": ".", "，": ",", "、": ",", "；": ";", "！": "!", "？": "?",
+            "：": ":", "（": "(", "）": ")", "〔": "[", "〕": "]", "【": "[",
+            "】": "]", "｛": "{", "｝": "}", "『": "“", "』": "”", "～": "~",
+            "…": "...", "〖": "[", "〗": "]", "〘": "[", "〙": "]", "〚": "[",
+            "〛": "]", "　": " "
         };
 
         // Chuyển đổi từng ký tự trong văn bản dựa trên bảng ánh xạ
@@ -211,17 +211,24 @@ class Dictionary {
     }
 
     processText(text) {
-        const trimSpacesBefore = / +([,.?!\]\>”’):])/g;
-        const trimSpacesAfter = /([<\[“‘(]) +/g;
-        const capitalizeRegex = /(^\s*|[.!?“‘”’\[-]\s*)(\p{Ll})/gmu;
+        const trimSpacesBefore = / +([,.?!\]\>):])/g;
+        const trimSpacesBefore2 = / +([”’])/g;
+        const trimSpacesAfter = /([<\[(“‘]) +/g;
+        const capitalizeRegex = /(^\s*|[“‘”’.!?\[-]\s*)(\p{Ll})/gmu;
         const multipleSpaces = / +/g;
 
-        const lines = text.split('\n').map(line => line.trim()).join('\n');
-        const trimmedLines = lines.replace(trimSpacesBefore, '$1').replace(trimSpacesAfter, '$1');
-        const processedText = trimmedLines.replace(capitalizeRegex, (_, p1, p2) => p1 + p2.toUpperCase());
-        const finalResult = processedText.replace(/[“‘”’]/g, '"').replace(multipleSpaces, ' ');
+        const trimmedText = text
+            .split('\n')
+            .map(line => line.trim())
+            .join('\n')
+            .replace(trimSpacesBefore, '$1 ')
+            .replace(trimSpacesBefore2, '$1')
+            .replace(trimSpacesAfter, ' $1')
+            .replace(capitalizeRegex, (_, p1, p2) => p1 + p2.toUpperCase())
+            .replace(/[“‘”’]/g, '"')
+            .replace(multipleSpaces, ' ');
 
-        return finalResult;
+        return trimmedText;
     }
 
     // Hàm tự gọi khởi tạo đối tượng Dictionary và thực hiện dịch văn bản
