@@ -211,22 +211,15 @@ class Dictionary {
     }
 
     processText(text) {
-        const trimSpacesBefore = / +([,.?!\]\>):])/g;
-        const trimSpacesBefore2 = / +([”’])/g;
-        const trimSpacesAfter = /([<\[(“‘]) +/g;
-        const capitalizeRegex = /(^\s*|[“‘”’.!?\[-]\s*)(\p{Ll})/gmu;
-        const multipleSpaces = / +/g;
-
         const trimmedText = text
             .split('\n')
             .map(line => line.trim())
             .join('\n')
-            .replace(trimSpacesBefore, '$1 ')
-            .replace(trimSpacesBefore2, '$1')
-            .replace(trimSpacesAfter, ' $1')
-            .replace(capitalizeRegex, (_, p1, p2) => p1 + p2.toUpperCase())
-            .replace(/[“‘”’]/g, '"')
-            .replace(multipleSpaces, ' ');
+            .replace(/ +([,.?!\]\>):])/g, '$1 ')
+            .replace(/ +([”’])/g, '$1')
+            .replace(/([<\[(“‘]) +/g, ' $1')
+            .replace(/(^\s*|[“‘”’.!?\[-]\s*)(\p{Ll})/gmu, (_, p1, p2) => p1 + p2.toUpperCase())
+            .replace(/ +/g, ' ');
 
         return trimmedText;
     }
