@@ -215,9 +215,9 @@ class Dictionary {
             .split('\n')
             .map(line => line.trim())
             .join('\n')
-            .replace(/ +([,.?!\]\>):])/g, '$1 ')
+            .replace(/ +([,.?!\]\>:};)])/g, '$1 ')
             .replace(/ +([”’])/g, '$1')
-            .replace(/([<\[(“‘]) +/g, ' $1')
+            .replace(/([<\[(“‘{]) +/g, ' $1')
             .replace(/(^\s*|[“‘”’.!?\[-]\s*)(\p{Ll})/gmu, (_, p1, p2) => p1 + p2.toUpperCase())
             .replace(/ +/g, ' ');
 
